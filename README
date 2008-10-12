@@ -1,0 +1,196 @@
+slash - a new shell for unix
+============================
+    ) author    :: brian reily
+    ) site      :: brianreily.com/projects/slash 
+
+table of contents
+-----------------
+    ) why
+    ) building
+    ) features / functionality
+    ) modes
+    ) usage
+    ) todo
+    ) source code
+
+why
+---
+    ) slash started as a school project that began as a simple
+      while loop that passed commands to exec.
+
+    ) i slowly started adding features (aliases, globs, etc) and
+      it go to the point where it become a pretty usable shell.
+
+    ) development continues mainly as a learning process, both for
+      myself and for others that want to learn how a shell works.  i
+      feel the codebase is small enough that its easy to see whats
+      going on - one of my main tasks now is adding comments wherever
+      possible.
+    
+    ) slash is not meant as a replacement for bash or zsh, but hacking
+      on it greatly increases your understanding of unix.
+
+building
+--------
+    1) set some options in config.h - you can change most of these later
+       in your startup config file or with command line flags, but its 
+       easiest to set them now.
+    2) make
+    3a) ./slash 
+    3b) cp slash /bin/; slash
+    4) to exit the shell, use 'exit' or 'x'
+
+features / functionality
+------------------------
+    ) aliases
+        > aliases work as in bash - if the first token in a command line is
+          an alias, it is expanded to whatever that alias stands for.
+        > example:
+            ] $ alias lf 'ls -F'    # Aliases 'lf' to 'ls -F'
+            ] $ lf                  # Expands to 'ls -F'
+        > another example:
+            ] $ alias rm 'rm -i'    # Aliases 'rm' to 'rm -i'
+            ] $ rm important_file   # Expands to 'rm -i important_file'
+        > to see all active aliases, use 'get -aliases'
+
+    ) config files / profiles
+        > slash automatically loads a configuration file at startup
+        > by default, this is ~/.slash_config
+        > this is ideally where you would customize your prompt, aliases,
+          settings; source other files; etc.
+        > to load a different configuration file at startup, use the -c or
+          --config [FILE] options
+        > to not load a configuration file at all, use the -nc or --noconfig
+          options
+
+    ) globbing / wildcard expressions
+        > slash offers globbing with the '*' character
+        > example:
+            ] $ ls *c *h
+            ] aliases.c aliases.h builtins.c builtins.h ...
+        > example:
+            ] $ ls
+            ] projects/ source/
+            ] $ cd p*
+
+    ) environment variables
+        > slash uses a number of variables
+        > variables inside commands will expand:
+            ] $ set @dir /Users/brian/code
+            ] $ cd {@dir}
+        > to get the value of a variable, use 'get [VARIABLE]':
+            ] $ get @config
+            ] ~/.slash_config
+        > to set the value of a variable, use 'set [VARIABLE] [VALUE]':
+            ] $ set @config '~/.other_config'
+        > to see the values of all shell variables, use 'get -all'    
+
+    ) customizable prompt
+        > slash allows a number of useful macros to use in your prompt; to
+          see a full listing look in prompt.c or in 'help prompt'
+        > example:
+            ] $ set @prompt '{pwd}$ '
+            ] ~/projects$ set @prompt '{date%H:%M:%S}$ '
+            ] 01:05:57$ set @prompt 'hello, {user}$ '
+            ] hello, brian$ 
+        > the date macro takes the same parameters as the actual 'date'
+          shell command - instead of 'date +"%H:%M:%S"', you use 
+          {date%H:%M:%S} as the macro.  this accepts anything that the 
+          date command accepts.
+
+    ) scripts
+        > slash allows you to execute a script of shell commands
+        > currently, advanced shell features like loops and conditionals
+          are not accepted
+        > you can execute scripts using the 'source' command, or by using
+          the -s or --script [FILE] command line options
+          
+    ) redirection of stdin and stdout
+        > slash allows you to redirect stdin from a file:
+            ] $ cat < a.txt
+        > slash allows you to redirect stdout, truncating a file:
+            ] $ ls > a.txt
+        > slash also allows you to redirect stdout, appending a file:
+            ] $ ls >> a.txt
+        > you can combine these:
+            ] $ head < a.txt > b.txt
+
+    ) pipes
+        > pipes are a work in progress
+
+modes
+-----
+    ) slash offers various modes of operation:
+        > normal mode:  this presents the standard shell interaction, where
+                     ]  the user is presented with a prompt to type in
+                     ]  commands.
+
+        > script mode:  this allows the user to run a script of shell commands,
+                     ]  by using the -s or --script command line options.  this
+                     ]  mode exits after running the script, unless a -ne or
+                     ]  --noexit command line option is included, in which case
+                     ]  slash switches to normal mode.
+
+        > command mode: this allows the user to run a single command, by using
+                      ] the -e or --execute command line options.  like script
+                      ] mode, the shell defaults to exiting afterwards.  the
+                      ] command must be surrounded by quotes.
+
+todo
+----
+    ) pipes are the last major/required feature that needs to be added.
+      there is code in place for it but it currently doesn't work.
+    
+    ) comments are going to be added liberally all over the place, both
+      for my organization (the code has grown a lot and i haven't been
+      able to keep up) and for other people's understanding.
+
+source code
+-----------
+    1) slash.c
+        > location of main()
+    
+    2) aliases.h / aliases.c
+        > set, store and substitute aliases
+
+    3) bg.h / bg.c
+        > checks if function should be in the background
+
+    4) builtins.h / builtins.c
+        > parse and execute builtin commands
+
+    5) config.h
+        > allows you to set a number of options before building
+
+    6) environ.h / environ.c
+        > set, get, and store environment variables and settings
+    
+    7) error.h / error.c
+        > handles error message printing for slash
+
+    8) eval.h / eval.c
+        > evaluates each command line
+
+    9) globbing.h / globbing.c
+        > handles wildcard support for slash
+
+   10) help.h / help.c
+        > handles all help and usage commands
+    
+   11) init.h / init.c
+        > handles all setup tasks, before presenting a prompt
+
+   12) input.h / input.c
+        > handles both file and command line input
+
+   13) options.h / options.c
+        > parses command line flags
+
+   14) parser.h / parser.c
+        > splits command lines into arrays of tokens
+
+   15) prompt.h / prompt.c
+        > handles printing the prompt and evaluating prompt macros
+
+   16) redirect.h / redirect.c
+        > handles io redirection
