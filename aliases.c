@@ -3,12 +3,17 @@
 
 #include "aliases.h"
 
+// Store aliases.
 ALIAS aliases[] = {};
 int num_aliases = 0;
 
+// Add an alias - if it exists already it overwrites the current
+// alias.  Currently there is no way to unalias something.
 int set_alias(char *name, char *command) {
+    // Check for existing alias.
     int i = 0;
     while (i < num_aliases) {
+        // Overwrite existing alias.
         if (!strcmp(aliases[i].name, name)) {
             free(aliases[i].command);
             aliases[i].command = calloc(1, strlen(command) + 1);
@@ -17,7 +22,10 @@ int set_alias(char *name, char *command) {
         }
         i++;
     }
+    // Reached alias limit - this is dumb to have a limit, I should
+    // probably change it to some form of linked list.
     if (num_aliases == 100) return 0;
+    // Add a new alias.
     char *a_name = calloc(1, strlen(name) + 1);
     strcpy(a_name, name);
     char *a_command = calloc(1, strlen(command) + 1);
@@ -28,7 +36,9 @@ int set_alias(char *name, char *command) {
     return 2;
 }
 
+// Expands aliases at the beginning of command lines - no global aliases.
 void expand_aliases(char *line) {
+    // Iterate through the list of aliases.
     int a = 0;
     while (a < num_aliases) {
         int alias_len = strlen(aliases[a].name);

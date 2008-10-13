@@ -10,7 +10,7 @@ table of contents
     ) features / functionality
     ) modes
     ) usage
-    ) todo
+    ) todo / issues
     ) source code
 
 why
@@ -136,14 +136,18 @@ modes
                       ] mode, the shell defaults to exiting afterwards.  the
                       ] command must be surrounded by quotes.
 
-todo
-----
+todo / issues
+-------------
     ) pipes are the last major/required feature that needs to be added.
       there is code in place for it but it currently doesn't work.
     
     ) comments are going to be added liberally all over the place, both
       for my organization (the code has grown a lot and i haven't been
       able to keep up) and for other people's understanding.
+    
+    ) using a history file doesn't work right now - it seems as simple as
+      calling the history library's function for that but it returns an
+      error and doesn't read anything.
 
 source code
 -----------
