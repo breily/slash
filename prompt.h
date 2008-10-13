@@ -14,6 +14,6 @@ void eval_macro(char *macro, char *prompt);
  *  macro blocks to eval_macro().  At the end,
  *  prints prompt.
  */
-char * print_prompt(char *prompt);
+char *eval_prompt(char *prompt);
 
 #endif

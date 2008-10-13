@@ -51,7 +51,7 @@ void eval_macro(char *macro, char *prompt) {
     }
 }
 
-char *  print_prompt(char *prompt) {
+char *eval_prompt(char *prompt) {
     sub_env(prompt);
     // Flag to indicate inside {...} block
     int in_macro = 0;
@@ -93,7 +93,6 @@ char *  print_prompt(char *prompt) {
     if (in_macro && strlen(macro)) {
         eval_macro(macro, new_prompt);
     }
-    //printf("%s", new_prompt);
     char *copy = calloc(1, strlen(new_prompt) + 1);
     strcpy(copy, new_prompt);
     free(new_prompt);

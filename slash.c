@@ -6,6 +6,10 @@
 #include "init.h"
 
 int main(int argc, char **argv) {
+    /*
+     *  Initialize everything we need before reading any commands.
+     *  See init.c for explanations.
+     */
     init_settings();
     init_options(argc, argv);
     init_execute();
@@ -15,10 +19,15 @@ int main(int argc, char **argv) {
     init_config();
 
     while (1) {
-        char *prompt = (char *) print_prompt(get_env("@prompt"));
+        // Expand macros in the prompt.
+        char *prompt = (char *) eval_prompt(get_env("@prompt"));
+        // Use readline() to read input.
         char *command = calloc(1, 1024);
         command = (char *) read_stdin(prompt);
+
         eval(command);
+
+        // Be responsible and call free.
         free(command);
         free(prompt);
     }
