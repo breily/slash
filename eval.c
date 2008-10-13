@@ -87,7 +87,11 @@ void eval(char *command) {
      */
     PARSED pipes = split(command, '|');
 
-    if (pipes.count) {
+    /*
+     *  Right now, pipes don't work, so they've been disabled.  Thats
+     *  at the top of the todo list though, so check back.
+     */
+    if (pipes.count == -1) {
         int pipes_fd[2];
         int pipe_ret = pipe(pipes_fd);
         //int pipe1[2];
@@ -199,12 +203,15 @@ void eval(char *command) {
             free_parsed(tokens);
             i++;
         }
-    // end pipes execution    
+    // End pipes execution    
     } else {
         PARSED tokens = get_tokens(command);
         tokens.count = check_bg(tokens);
         /*
-         *  Don't fork to exec builtins.
+         *  Don't fork to exec builtins - if we fork and run a builtin like
+         *  'set @prompt "$ "', then the @prompt environment variable only
+         *  actually gets changed in the forked process, not in the shell
+         *  that we're actually running.
          */
         if (check_builtin(tokens)) {
             int in_file = get_infile(&tokens);
@@ -217,13 +224,24 @@ void eval(char *command) {
             pid_t pid;
             int ret;
             if ((pid = fork()) == 0) {
+                /*
+                 *  Fork again to run a background task. The reason we do this
+                 *  is because to detach a process from its parent you have to 
+                 *  kill the parent.  At first I tried just making the parent
+                 *  not wait for the child, but this just created zombie processes.
+                 *  If we fork again, kill the first child, then the background
+                 *  task runs as the second process.  The parent stops waiting after
+                 *  the first child is killed, so everything works.
+                 */
                 if (get_setting("@background?")) {
                     pid_t pid2;
                     if ((pid2 = fork()) < 0) {
                         error("fork", "second fork failed");
                     } else if (pid2 > 0) {
+                        // Kill child 1.
                         exit(EXIT_SUCCESS);
                     }
+                    // We're now in the second child.
                     fprintf(stderr, "[%d] %s\n", getpid(), command);
                 }
 
