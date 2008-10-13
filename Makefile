@@ -10,9 +10,9 @@ RL_FLAG = -lreadline
 FLAGS = -Wall
 OUTFILE = slash
 
-OFILES = build/aliases.o build/bg.o build/builtin.o \
-         build/environ.o build/error.o build/eval.o \
-         build/globbing.o build/help.o build/init.o \
+OFILES = build/aliases.o build/bg.o build/builtin.o  \
+         build/environ.o build/error.o build/eval.o  \
+         build/globbing.o build/help.o build/init.o  \
          build/input.o build/options.o build/parser.o \
          build/prompt.o build/redir.o build/slash.o
 
