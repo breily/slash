@@ -1,6 +1,9 @@
 # Brian Reily
 #
 # Makefile for slash
+#
+# TODO:
+#   add 'install' rules    
 
 GCC = gcc
 RL_FLAG = -lreadline

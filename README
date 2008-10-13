@@ -148,6 +148,9 @@ todo / issues
     ) using a history file doesn't work right now - it seems as simple as
       calling the history library's function for that but it returns an
       error and doesn't read anything.
+    
+    ) right now make simply compiles slash; i need to add a 'make install'
+      rule
 
 source code
 -----------
