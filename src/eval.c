@@ -95,88 +95,33 @@ void eval(char *command) {
     if (pipes.count == -1) {
         int pipes_fd[2];
         int pipe_ret = pipe(pipes_fd);
-        //int pipe1[2];
-        //int pipe_ret1 = pipe(pipe1);
-        //int pipe2[2];
-        //int pipe_ret2 = pipe(pipe2);
-        //if (pipe_ret1 == -1 || pipe_ret2 == -1) {
         if(pipe_ret == -1) {
             error("pipe", "couldn't connect file descriptors");
             free_parsed(pipes);
             return;
+        // temporary    
         } else {
             printf("pipe between %d and %d\n", pipes_fd[0], pipes_fd[1]);
         }
         pid_t pid;
         int ret;
         int i = 0;
-        int current_pipe_out = 1;
         while (i < pipes.count) {
             PARSED tokens = get_tokens(pipes.storage[i]);
             tokens.count = check_bg(tokens);
 
-            printf("piped command: %s\n", pipes.storage[i]);
-            
             if ((pid = fork()) == 0) {
-                /*
-                int in_file = get_infile(&tokens);
-                int out_file = get_outfile(&tokens);
-                int new_in;
-                int new_out;
-                *//*
-                if (i == 0) {
-                    out_file = -1;
-                    close(STDOUT_FILENO);
-                    new_out = dup(pipe2[0]);
-                    if (new_out == -1) {
-                        error("pipe", "couldn't dup stdout");
-                        exit(EXIT_FAILURE);
-                    }
-                } else if (i == (pipes.count - 1)) {
-                    in_file = -1;
-                    close(STDIN_FILENO);
-                    if (current_pipe_out == 1) {
-                        new_in = dup(pipe1[1]);
-                    } else {
-                        new_in = dup(pipe2[1]);
-                    }
-                    if (new_in == -1) {
-                        error("pipe", "couldn't dup stdin");
-                        exit(EXIT_FAILURE);
-                    }
-                } else {
-                    in_file = -1;
-                    out_file = -1;
-                    close(STDOUT_FILENO);
-                    if (current_pipe_out == 1) {
-                        new_out = dup(pipe2[0]);
-                    } else {
-                        new_out = dup(pipe1[0]);
-                    }
-                    if (new_out == -1) {
-                        error("pipe", "couldn't dup stdout");
-                        exit(EXIT_FAILURE);
-                    }
-                    close(STDIN_FILENO);
-                    if (current_pipe_out == 1) {
-                        new_in = dup(pipe2[0]);
-                    } else {
-                        new_in = dup(pipe2[0]);
-                    }
-                    if (new_in == -1) {
-                        error("pipe", "couldn't dup stdin");
-                        exit(EXIT_FAILURE);
-                    }
-                }
-                */
+                fprintf(stderr, "executing: %s\n", pipes.storage[i]);
                 if (i == 0) {
                     close(STDOUT_FILENO);
-                    int new_out = dup(pipes_fd[1]);
+                    int new_out = dup(pipes_fd[0]);
                     fprintf(stderr, "new out: %d\n", new_out);
+                    //dup2(pipes_fd[1], STDOUT_FILENO);
                 } else if (i == 1) {
                     close(STDIN_FILENO);
-                    int new_in = dup(pipes_fd[0]);
+                    int new_in = dup(pipes_fd[1]);
                     fprintf(stderr, "new in: %d\n", new_in);
+                    //dup2(pipes_fd[0], STDIN_FILENO);
                 }
                 int in_file = -1; int out_file = -1;
                 exec_process(tokens, in_file, out_file);
@@ -191,11 +136,6 @@ void eval(char *command) {
                     } else {
                         fprintf(stderr, "[exit %d] %s: failure?\n", ret, command);
                     }
-                }
-                if (current_pipe_out == 1) {
-                    current_pipe_out = 2;
-                } else {
-                    current_pipe_out = 1;
                 }
             } else {
                 error(tokens.storage[0], "first fork failed");
