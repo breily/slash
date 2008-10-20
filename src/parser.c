@@ -1,10 +1,8 @@
 #include <string.h>
 #include <stdlib.h>
-
-#include <stdio.h>
-
 #include "parser.h"
 
+// used to split lines on ';' or '|'
 PARSED split(char *line, char splitter) {
     if (strchr(line, splitter) != NULL) {
         // Find out how much space is needed, and allocate it.
@@ -50,6 +48,8 @@ PARSED split(char *line, char splitter) {
     return p;
 }
 
+// splits a line into tokens - delimited by spaces, but
+// also respects quotes
 PARSED get_tokens(char *line) {
     int ct = _count_char(line, ' ') + 1;
     char **ret = calloc(ct, sizeof *ret);
@@ -130,6 +130,8 @@ PARSED get_tokens(char *line) {
     return p;
 }
 
+// counts the occurences of a character in a line - used to
+// determine storage sizes for arrays of strings
 int _count_char(char *line, char search) {
     int ret = 0;
     int i = 0;
@@ -142,12 +144,14 @@ int _count_char(char *line, char search) {
     return ret;
 }
 
+// stores a string into an array of strings
 int _store(char *buf, char **array, int r) {
     array[r] = calloc(1, strlen(buf) + 1);
     strcpy(array[r], buf);
     return (r + 1);
 }
 
+// frees a PARSED structure
 void free_parsed(PARSED p) {
     while (p.count > 0) {
         free(p.storage[p.count - 1]);
@@ -155,31 +159,30 @@ void free_parsed(PARSED p) {
     }
 }
 
+// removes comments - marked by '#'
+// doesn't work too well right now, so its not used
 char* strip_comments(char *line) {
     if (strchr(line, '#') != NULL) {
         char *new_line = calloc(1, strlen(line));
-        strcpy(new_line, "");
+        *new_line -= *new_line;
         int i = 0;
         while (i < strlen(line)) {
             if (line[i] == '#') break;
             new_line[i] = line[i];
             i++;
         }
-        //printf("new line: '%s'\n", new_line);
         int ct = strlen(new_line);
         while(new_line[ct] == ' ' || new_line[ct] == '\t') {
             ct--;
         }
-        //printf("command length: %d\n", ct);
-        //free(line);
         char *line = calloc(1, ct + 2);
         strncpy(line, new_line, ct + 1);
-        //printf("line: '%s'\n", line);
         free(new_line);
     }
     return line;
 }
 
+// replaces all '~' with the user's home directory
 void replace_tilde(char *line) {
     if (strchr(line, '~') != NULL) {
         char *new_line = calloc(1, strlen(line) + strlen(getenv("HOME")));

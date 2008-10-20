@@ -6,6 +6,7 @@
 #include "redir.h"
 #include "parser.h"
 
+// opens a filename and returns its file descriptor
 int get_infile(PARSED *tokens) {
     REDIRECTION file = _get_filename(*tokens, "<");
     if (file.file_name != NULL) {
@@ -21,6 +22,8 @@ int get_infile(PARSED *tokens) {
     return -1;
 }
 
+// opens a filename either in truncate ('>') or append ('>>') mode
+// and returns its file descriptor
 int get_outfile(PARSED *tokens) {
     REDIRECTION file = _get_filename(*tokens, ">>");
     if (file.file_name != NULL) {
@@ -48,6 +51,8 @@ int get_outfile(PARSED *tokens) {
     return -1;
 }
 
+// looks for a filename after a certain symbol - either '<', '>', or '>>'
+// returns the file name given - a space is not necessary
 REDIRECTION _get_filename(PARSED tokens, char *search) {
     // array to hold tokens not involved in redirection
     char **new_tokens = calloc(tokens.count, sizeof *new_tokens);

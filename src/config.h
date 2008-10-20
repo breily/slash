@@ -1,3 +1,8 @@
+/*
+ *  This file contains all the settings that you can change before
+ *  compilation.
+ */
+
 #ifndef CONFIG_H
 #define CONFIG_H
 

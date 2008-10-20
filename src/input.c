@@ -1,12 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include <readline/readline.h>
-
 #include "eval.h"
 #include "input.h"
 
+// reads in a file and evaluates each line
 int read_file(char *file_name) {
     int in_home_dir = 0;
     if (strchr(file_name, '~') != NULL) {
@@ -25,7 +24,7 @@ int read_file(char *file_name) {
     }
 
     char *command = calloc(1, 1024);
-    strcpy(command, "");
+    *command -= *command;
     int len = 0;
     int c;
     while ((c = getc(fp)) != EOF) {
@@ -33,7 +32,7 @@ int read_file(char *file_name) {
             if (len) eval(command);
             free(command);
             char *command = calloc(1, 1024);
-            strcpy(command, "");
+            *command -= *command;
             len = 0;
         } else {
             command[len] = c;
@@ -46,19 +45,9 @@ int read_file(char *file_name) {
     return 1;
 }
 
+// basically just calls readline and returns the result.
+// this is used because it used to be its own function.
 char * read_stdin(char *prompt) {
-    /*
-    strcpy(ret, "");
-    int len = 0;
-    int cur;
-    while ((cur = getchar()) != EOF) {
-        if (cur == '\n') break;
-        ret[len] = cur;
-        len++;
-    }
-    if (cur == EOF && len == 0) return;
-    ret[len] = '\0';
-    */
     char *ret = readline(prompt);
     return ret;
 }

@@ -32,7 +32,7 @@ char* get_env(char *n) {
         }
     }
     char *ret = calloc(1, 1);
-    strcpy(ret, "");
+    *ret -= *ret;
     return ret;
 }
 

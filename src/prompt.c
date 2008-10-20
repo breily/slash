@@ -59,10 +59,9 @@ char *eval_prompt(char *prompt) {
     int prompt_len = strlen(prompt);
     // Buffers
     char macro[prompt_len];
+    *macro -= *macro;
     char *new_prompt = calloc(1, 128);
-    strcpy(macro, "");
-    strcpy(new_prompt, "");
-    // Loop counter
+    *new_prompt -= *new_prompt;
     int i = 0;
     while (i < prompt_len) {
         if (prompt[i] == '\\' && prompt[i - 1] != '\\') {
